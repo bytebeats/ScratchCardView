@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ScratchCardView">
-        <attr name="backgroundImage" format="reference|color" />
         <attr name="foregroundImage" format="reference|color" />
         <attr name="text" format="string" />
+        <attr name="strokeWith" format="dimension" />
     </declare-styleable>
 </resources>
