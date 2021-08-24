@@ -48,6 +48,10 @@ class ScratchTextView @JvmOverloads constructor(
     private var mGradientStartColor = OnScratchListener.SCRATCH_GRADIENT_START_COLOR
     private var mGradientEndColor = OnScratchListener.SCRATCH_GRADIENT_END_COLOR
     private var mStrokeWidth: Float = 0f
+        set(value) {
+            field = value
+            mErasePaint.strokeWidth = field
+        }
 
     private var mX = 0.0F
     private var mY = 0.0F
@@ -183,14 +187,12 @@ class ScratchTextView @JvmOverloads constructor(
         val top = bounds[1]
         val w = bounds[2] - left
         val h = bounds[3] - top
-        Log.i(TAG, Thread.currentThread().toString())
         val croppedBitmap = Bitmap.createBitmap(mScratchBitmap!!, left, top, w, h)
         val revealedPercent = BitmapHelper.transparentPixelPercent(croppedBitmap)
         post { callbackOnUIThread(revealedPercent) }
     }
 
     private fun callbackOnUIThread(scratchedPercent: Float) {
-        Log.i(TAG, Thread.currentThread().toString())
         if (!isRevealed()) {
             val old = mScratchPercent
             mScratchPercent = scratchedPercent
@@ -203,7 +205,7 @@ class ScratchTextView @JvmOverloads constructor(
         }
     }
 
-    fun isRevealed(): Boolean = mScratchPercent == 1.0F
+    fun isRevealed(): Boolean = mScratchPercent > 0.95F
 
     private fun textBounds(scale: Float = 1.0F): IntArray {
         val centerX = width / 2
@@ -255,8 +257,8 @@ class ScratchTextView @JvmOverloads constructor(
         return intArrayOf(w, h)
     }
 
-    fun setStrokeWidth(multiplier: Int) {
-        mErasePaint.strokeWidth = multiplier * OnScratchListener.DEFAULT_STROKE_WIDTH
+    fun setStrokeWidth(strokeWidth: Float) {
+        mErasePaint.strokeWidth = strokeWidth
     }
 
     companion object {

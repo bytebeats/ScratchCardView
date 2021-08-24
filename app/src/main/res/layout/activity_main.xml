@@ -25,6 +25,12 @@
         app:gradientEndColor="#003399"
         app:gradientStartColor="#009933"
         app:revealedText="@string/scratch_text_view"
-        app:stroke="20dp" />
+        app:stroke="10dp" />
+
+    <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reset" />
 
 </LinearLayout>
