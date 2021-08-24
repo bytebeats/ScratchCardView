@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ScratchView">
+        <attr name="gradientStartColor" format="reference|color" />
+        <attr name="gradientEndColor" format="reference|color" />
+        <attr name="foreground" format="reference|color" />
+        <attr name="revealedText" format="string" />
+        <attr name="stroke" format="dimension" />
+    </declare-styleable>
+</resources>

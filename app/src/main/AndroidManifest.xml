@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.bytebeats.scratchcard">
+    package="me.bytebeats.views.scratchcard.app">
 
     <application
         android:allowBackup="true"
@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ScratchCardView">
         <activity
-            android:name="me.bytebeats.scratchcard.MainActivity"
+            android:name="me.bytebeats.scratchcard.app.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
