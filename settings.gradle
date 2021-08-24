@@ -19,4 +19,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ScratchCardView"
 include ':app'
-include ':scratchcard'
+include ':scratch-library'
