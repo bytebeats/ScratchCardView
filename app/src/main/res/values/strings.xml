@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ScratchCardView</string>
+    <string name="scratch_text_view">This is a ScratchTextView</string>
 </resources>
