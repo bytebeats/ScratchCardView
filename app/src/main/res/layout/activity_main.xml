@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="top|center_horizontal"
     android:orientation="vertical"
     tools:context="me.bytebeats.scratchcard.app.MainActivity">
 
@@ -19,12 +20,32 @@
         android:id="@+id/scratch_text_view"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@drawable/ic_scratch_pattern"
         android:gravity="center"
         android:textColor="@android:color/holo_orange_dark"
         app:foreground="@drawable/ic_scratch_pattern"
         app:gradientEndColor="#003399"
         app:gradientStartColor="#009933"
         app:revealedText="@string/scratch_text_view"
+        app:stroke="10dp" />
+
+    <me.bytebeats.views.scratch.ScratchImageView
+        android:id="@+id/scratch_image_view"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:background="@color/design_default_color_secondary"
+        android:gravity="center"
+        android:padding="10dp"
+        android:src="@mipmap/ic_launcher"
+        app:foreground="@drawable/ic_scratch_pattern"
+        app:gradientEndColor="#009933"
+        app:gradientStartColor="#003399"
         app:stroke="20dp" />
+
+    <Button
+        android:id="@+id/btn_reset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reset" />
 
 </LinearLayout>

@@ -7,10 +7,10 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.annotation.MainThread
+import androidx.appcompat.widget.AppCompatImageView
 import kotlin.math.absoluteValue
 
 /**
@@ -18,11 +18,11 @@ import kotlin.math.absoluteValue
  * E-mail: happychinapc@gmail.com
  * Quote: Peasant. Educated. Worker
  */
-class ScratchTextView @JvmOverloads constructor(
+class ScratchImageView @JvmOverloads constructor(
     context: Context,
     attributes: AttributeSet? = null,
     defStyleRes: Int = 0
-) : AppCompatTextView(context, attributes, defStyleRes), IScratchView {
+) : AppCompatImageView(context, attributes, defStyleRes), IScratchView {
     private var mScratchBitmap: Bitmap? = null
     private var mCanvas: Canvas? = null
     private val mErasePath by lazy { Path() }
@@ -42,7 +42,7 @@ class ScratchTextView @JvmOverloads constructor(
     }
     private val mGradientPaint by lazy { Paint() }
     private var mForegroundDrawable: BitmapDrawable? = null
-    var onScratchListener: OnScratchListener<ScratchTextView>? = null
+    var onScratchListener: OnScratchListener<ScratchImageView>? = null
     private var mScratchPercent: Float = 0.0F
 
     private var mGradientStartColor = OnScratchListener.SCRATCH_GRADIENT_START_COLOR
@@ -88,7 +88,6 @@ class ScratchTextView @JvmOverloads constructor(
             R.styleable.ScratchView_stroke,
             OnScratchListener.DEFAULT_STROKE_WIDTH
         )
-        text = a.getString(R.styleable.ScratchView_revealedText)
         a.recycle()
         mHandlerThread.start()
     }
@@ -173,10 +172,25 @@ class ScratchTextView @JvmOverloads constructor(
     }
 
     override fun reveal() {
-        val bounds = textBounds(1.5f).map { it.toFloat() }
+        val bounds = bounds().map { it.toFloat() }
+        var left = bounds[0]
+        var top = bounds[1]
+        var right = bounds[2]
+        var bottom = bounds[3]
+
+        val w = right - left
+        val h = bottom - top
+        val centerX = left + w / 2
+        val centerY = top + h / 2
+
+        left = centerX - w / 2
+        top = centerY - h / 2
+        right = left + w
+        bottom = top + h
+
         val paint = Paint()
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-        mCanvas?.drawRect(bounds[0], bounds[1], bounds[2], bounds[3], paint)
+        mCanvas?.drawRect(left, top, right, bottom, paint)
         checkRevealed()
         invalidate()
     }
@@ -192,6 +206,7 @@ class ScratchTextView @JvmOverloads constructor(
         post { callbackOnUIThread(revealedPercent) }
     }
 
+    @MainThread
     private fun callbackOnUIThread(scratchedPercent: Float) {
         if (!isRevealed()) {
             val old = mScratchPercent
@@ -207,56 +222,55 @@ class ScratchTextView @JvmOverloads constructor(
 
     override fun isRevealed(): Boolean = mScratchPercent > 0.95F
 
-    override fun bounds(): IntArray = textBounds()
+    override fun bounds(): IntArray = imageBounds()
 
-    private fun textBounds(scale: Float = 1.0F): IntArray {
+    private fun imageBounds(): IntArray {
+        val vw = width - paddingLeft - paddingRight
+        val vh = height - paddingBottom - paddingTop
         val centerX = width / 2
         val centerY = height / 2
-        val dimens = textDimens()
-        var w = dimens[0]
-        var h = dimens[1]
-        val lines = lineCount
-        w /= lines
-        h *= lines
-        h = if (h > height) {
-            height - paddingBottom - paddingTop
-        } else {
-            (h * scale).toInt()
+
+        val bounds = drawable.bounds
+
+        var w = drawable.intrinsicWidth
+        var h = drawable.intrinsicHeight
+        if (w <= 0) {
+            w = bounds.right - bounds.left
         }
-        w = if (w > width) {
-            width - paddingLeft - paddingRight
-        } else {
-            (w * scale).toInt()
+        if (h <= 0) {
+            h = bounds.bottom - bounds.top
+        }
+        if (h > vh) {
+            h = vh
+        }
+        if (w > vw) {
+            w = vw
         }
 
-        val left = if (gravity and Gravity.LEFT == Gravity.LEFT) {
-            paddingLeft
-        } else if (gravity and Gravity.RIGHT == Gravity.RIGHT) {
-            width - paddingRight - w
-        } else if (gravity and Gravity.CENTER_HORIZONTAL == Gravity.CENTER_HORIZONTAL) {
-            centerX - w / 2
-        } else {
-            0
+        var left = 0
+        var top = 0
+        when (scaleType) {
+            ScaleType.FIT_START -> {
+                left = paddingLeft
+                top = centerY - h / 2
+            }
+            ScaleType.FIT_END -> {
+                left = vw - paddingRight - w
+                top = centerY - h / 2
+            }
+            ScaleType.CENTER -> {
+                left = centerX - w / 2
+                top = centerY - h / 2
+            }
+            else -> {
+                left = paddingLeft
+                top = paddingTop
+                w = vw
+                h = vh
+            }
         }
 
-        val top = if (gravity and Gravity.TOP == Gravity.TOP) {
-            paddingTop
-        } else if (gravity and Gravity.BOTTOM == Gravity.BOTTOM) {
-            height - paddingBottom - h
-        } else if (gravity and Gravity.CENTER_VERTICAL == Gravity.CENTER_VERTICAL) {
-            centerY - h / 2
-        } else {
-            0
-        }
         return intArrayOf(left, top, left + w, top + h)
-    }
-
-    private fun textDimens(): IntArray {
-        val bounds = Rect()
-        paint.getTextBounds(text.toString(), 0, text.length, bounds)
-        val w = bounds.left + bounds.width()
-        val h = bounds.bottom + bounds.height()
-        return intArrayOf(w, h)
     }
 
     override fun reset() {
@@ -264,7 +278,7 @@ class ScratchTextView @JvmOverloads constructor(
     }
 
     companion object {
-        private const val TAG = "ScratchTextView"
+        private const val TAG = "ScratchImageView"
         private const val MSG_TOUCH_MOVE = 0x1001
     }
 }
