@@ -63,7 +63,7 @@ class ScratchTextView @JvmOverloads constructor(
                 mBackgroundHandler = object : Handler(looper) {
                     override fun handleMessage(msg: Message) {
                         super.handleMessage(msg)
-                        if (msg.what == MSG_TOUCH_MOVE) {
+                        if (msg.what == IScratchView.MSG_TOUCH_MOVE) {
                             scratchOnBackground()
                         }
                     }
@@ -165,10 +165,10 @@ class ScratchTextView @JvmOverloads constructor(
 
     private fun checkRevealed() {
         if (!isRevealed() && onScratchListener != null) {
-            if (mBackgroundHandler?.hasMessages(MSG_TOUCH_MOVE) == true) {
+            if (mBackgroundHandler?.hasMessages(IScratchView.MSG_TOUCH_MOVE) == true) {
                 return
             }
-            mBackgroundHandler?.sendEmptyMessage(MSG_TOUCH_MOVE)
+            mBackgroundHandler?.sendEmptyMessage(IScratchView.MSG_TOUCH_MOVE)
         }
     }
 
@@ -265,6 +265,5 @@ class ScratchTextView @JvmOverloads constructor(
 
     companion object {
         private const val TAG = "ScratchTextView"
-        private const val MSG_TOUCH_MOVE = 0x1001
     }
 }
